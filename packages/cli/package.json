@@ -1,0 +1,30 @@
+{
+  "name": "0g-orbit-cli",
+  "version": "0.2.3",
+  "description": "CLI for 0G Orbit — store, infer, deploy from your terminal.",
+  "type": "module",
+  "bin": {
+    "orbit": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "0g-orbit-core": "workspace:*",
+    "commander": "^12.1.0",
+    "ora": "^8.0.1",
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.12.0"
+  },
+  "keywords": ["0g", "cli", "blockchain", "ai"],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

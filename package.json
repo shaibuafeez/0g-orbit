@@ -1,0 +1,85 @@
+{
+  "name": "0g-orbit",
+  "version": "0.2.3",
+  "description": "The developer toolkit for 0G. Store, infer, deploy — one SDK, one CLI, five minutes.",
+  "author": "cyber",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cyber/0g-orbit.git"
+  },
+  "homepage": "https://github.com/cyber/0g-orbit#readme",
+  "bugs": {
+    "url": "https://github.com/cyber/0g-orbit/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "bin": {
+    "orbit": "./dist/cli/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@0gfoundation/0g-ts-sdk": "^1.0.1",
+    "@0glabs/0g-serving-broker": "^0.7.4",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "ethers": "^6.13.1",
+    "ora": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  },
+  "keywords": [
+    "0g",
+    "zero-gravity",
+    "blockchain",
+    "ai",
+    "storage",
+    "inference",
+    "fine-tuning",
+    "sdk",
+    "cli",
+    "web3",
+    "decentralized"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "overrides": {
+    "axios": "1.14.0",
+    "open-jsonrpc-provider": {
+      "axios": "1.14.0"
+    }
+  },
+  "pnpm": {
+    "overrides": {
+      "axios": "1.14.0"
+    }
+  }
+}

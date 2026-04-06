@@ -1,0 +1,35 @@
+{
+  "name": "0g-orbit-core",
+  "version": "0.2.3",
+  "description": "Unified SDK for 0G — storage, compute, and chain in one interface.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@0gfoundation/0g-ts-sdk": "^1.0.1",
+    "@0glabs/0g-serving-broker": "^0.7.4",
+    "ethers": "^6.13.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  },
+  "keywords": ["0g", "blockchain", "ai", "storage", "inference"],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

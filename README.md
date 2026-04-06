@@ -1,19 +1,31 @@
-# 0G Orbit
+<p align="center">
+  <img src=".github/banner.png" alt="0G Orbit" width="600" />
+</p>
 
-The developer toolkit for [0G](https://0g.ai). Store, infer, fine-tune — one SDK, one CLI, five minutes.
+<p align="center">
+  <a href="https://www.npmjs.com/package/0g-orbit"><img src="https://img.shields.io/npm/v/0g-orbit?color=blue" alt="npm" /></a>
+  <a href="https://github.com/shaibuafeez/0g-orbit/actions/workflows/ci.yml"><img src="https://github.com/shaibuafeez/0g-orbit/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
+  <a href="https://www.npmjs.com/package/0g-orbit"><img src="https://img.shields.io/npm/dm/0g-orbit" alt="Downloads" /></a>
+  <a href="https://nodejs.org"><img src="https://img.shields.io/node/v/0g-orbit" alt="Node.js" /></a>
+</p>
 
-[![CI](https://github.com/cyber/0g-orbit/actions/workflows/ci.yml/badge.svg)](https://github.com/cyber/0g-orbit/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/0g-orbit)](https://www.npmjs.com/package/0g-orbit)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js](https://img.shields.io/node/v/0g-orbit)](https://nodejs.org)
+<p align="center">
+  One SDK. One CLI. Five minutes to production on <a href="https://0g.ai">0G</a>.
+</p>
 
-## What is this?
+---
 
-0G Orbit wraps the 0G storage SDK, serving broker, and chain interactions into a single unified interface. Instead of juggling `@0gfoundation/0g-ts-sdk`, `@0glabs/0g-serving-broker`, and raw ethers calls, you get one `Orbit` class and one `orbit` CLI.
+## Why Orbit?
 
-**Storage** — Upload and download files to 0G's decentralized storage network
-**Inference** — Run AI models on 0G's decentralized compute network
-**Fine-Tuning** — Upload datasets, create training tasks, download fine-tuned models
+Building on 0G means juggling `@0gfoundation/0g-ts-sdk`, `@0glabs/0g-serving-broker`, and raw ethers calls. Orbit wraps all of it into a single `Orbit` class and a single `orbit` CLI.
+
+- **Storage** — Upload and download files on 0G's decentralized storage network
+- **Inference** — Run AI models on 0G's decentralized compute network
+- **Fine-Tuning** — Upload datasets, train models, download results
+- **CLI** — Do everything above from your terminal
+- **Retry** — Automatic exponential backoff for transient failures
+- **TypeScript** — Full type safety, ESM-native
 
 ## Install
 
@@ -23,8 +35,6 @@ npm install 0g-orbit
 
 ## Quick Start
 
-### SDK
-
 ```typescript
 import { Orbit } from '0g-orbit'
 
@@ -33,104 +43,96 @@ const orbit = await Orbit.connect({
   privateKey: process.env.PRIVATE_KEY,
 })
 
-// Upload a file
-const { root, txHash } = await orbit.store('./data.json')
-console.log(`Stored: ${root}`)
+// Store a file
+const { root } = await orbit.store('./data.json')
 
-// Download it back
+// Retrieve it
 await orbit.retrieve(root, './downloaded.json')
 
 // Run AI inference
-const response = await orbit.infer('meta-llama/Llama-3.2-3B-Instruct', {
+const { content } = await orbit.infer('meta-llama/Llama-3.2-3B-Instruct', {
   message: 'Explain zero-knowledge proofs in one sentence.',
 })
-console.log(response.content)
 
 // Fine-tune a model
 const dataset = await orbit.uploadDataset('./training-data.jsonl')
-const task = await orbit.createFineTuneTask({
+await orbit.createFineTuneTask({
   model: 'base-model',
   dataset: dataset.root,
   providerAddress: '0x...',
 })
 ```
 
-### CLI
+## CLI
 
 ```bash
-# Set your private key
 export PRIVATE_KEY=0x...
 
-# Upload a file
-orbit store ./my-file.txt
-
-# Download a file
-orbit retrieve <rootHash> ./output.txt
-
-# Run inference
-orbit infer meta-llama/Llama-3.2-3B-Instruct -m "Hello, 0G!"
-
-# List available AI services
-orbit services
-
-# Fine-tune a model
-orbit fine-tune ./dataset.jsonl --model base-model --provider 0x...
-
-# Check account status
-orbit status
+orbit store ./my-file.txt                  # Upload a file
+orbit retrieve <rootHash> ./output.txt     # Download a file
+orbit infer llama-3.2 -m "Hello, 0G!"     # Run inference
+orbit fine-tune ./data.jsonl --model base  # Fine-tune a model
+orbit services                             # List AI services
+orbit models                               # List base models
+orbit tasks <provider>                     # Check fine-tune tasks
+orbit status                               # Wallet balance & info
+orbit init                                 # Scaffold a new project
 ```
 
-## API
+## API Reference
 
 ### `Orbit.connect(config)`
 
-Creates a connected Orbit instance.
-
-| Option | Type | Description |
-|---|---|---|
-| `network` | `'testnet' \| 'mainnet'` | Network to connect to |
-| `privateKey` | `string?` | Wallet private key (falls back to `PRIVATE_KEY` env var) |
-| `rpcUrl` | `string?` | Custom RPC URL |
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `network` | `'testnet' \| 'mainnet'` | — | Network to connect to |
+| `privateKey` | `string` | `process.env.PRIVATE_KEY` | Wallet private key |
+| `rpcUrl` | `string` | network default | Custom RPC endpoint |
 
 ### Storage
 
-| Method | Description |
-|---|---|
-| `orbit.store(path, options?)` | Upload a file, returns `{ root, txHash }` |
-| `orbit.storeData(text, options?)` | Upload a text string |
-| `orbit.retrieve(rootHash, outputPath, options?)` | Download a file by root hash |
+| Method | Returns | Description |
+|---|---|---|
+| `store(path, opts?)` | `{ root, txHash }` | Upload a file |
+| `storeData(data, opts?)` | `{ root, txHash }` | Upload a string, Buffer, or Uint8Array |
+| `retrieve(rootHash, path, opts?)` | `void` | Download a file by root hash |
 
 ### Inference
 
-| Method | Description |
-|---|---|
-| `orbit.infer(model, options)` | Run AI inference, returns `{ content, tokensUsed }` |
-| `orbit.listServices()` | List available AI services on the network |
+| Method | Returns | Description |
+|---|---|---|
+| `infer(model, opts)` | `{ content, tokensUsed }` | Run AI inference |
+| `listServices()` | `ServiceInfo[]` | List available AI services |
 
 ### Fine-Tuning
 
-| Method | Description |
-|---|---|
-| `orbit.uploadDataset(path)` | Upload a training dataset to storage |
-| `orbit.createFineTuneTask(options)` | Create a fine-tuning task |
-| `orbit.getFineTuneTask(provider, taskId)` | Check task status |
-| `orbit.downloadModel(provider, taskId, outputDir)` | Download a fine-tuned model |
-| `orbit.listModels()` | List available base models |
-| `orbit.listProviders()` | List fine-tuning providers |
+| Method | Returns | Description |
+|---|---|---|
+| `uploadDataset(path)` | `{ root, txHash }` | Upload training data |
+| `createFineTuneTask(opts)` | `FineTuneTask` | Start a fine-tuning job |
+| `getFineTuneTask(provider, id)` | `FineTuneTask` | Check task status |
+| `downloadModel(provider, id, dir)` | `void` | Download a fine-tuned model |
+| `listModels()` | `FineTuneModel[]` | List available base models |
+| `listProviders()` | `FineTuneProvider[]` | List fine-tuning providers |
 
 ### Direct Client Access
 
-For advanced usage, access the underlying clients directly:
-
 ```typescript
-orbit.storage    // StorageClient
-orbit.inference  // InferenceClient
-orbit.fineTuning // FineTuningClient
+orbit.storage      // StorageClient — low-level storage operations
+orbit.inference    // InferenceClient — low-level inference operations
+orbit.fineTuning   // FineTuningClient — low-level fine-tuning operations
 ```
+
+## Networks
+
+| Network | Chain ID | Status |
+|---|---|---|
+| Testnet | `16602` | Supported |
+| Mainnet | `16661` | Supported |
 
 ## Security
 
-This package has transitive dependencies with known vulnerabilities (from upstream 0G SDKs). To mitigate, add this to your project's `package.json`:
+This package has transitive vulnerabilities from upstream 0G SDKs. Add this to your project's `package.json` to mitigate:
 
 ```json
 {
@@ -144,7 +146,7 @@ See [SECURITY.md](SECURITY.md) for details.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions.
 
 ## License
 
